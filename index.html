@@ -1,4 +1,232 @@
-<!DOCTYPE HTML>
 <html>
-Muki?!
+<body>
+   <!--画板-->
+   <canvas id="canvas" style="background-color: black;">您当前的版本不支持       </canvas>
+
+   <script type="text/javascript">
+
+       // 拿到画板
+       var canvas = document.getElementById('canvas');
+       canvas.width = 1000;
+       canvas.height = 1000;
+
+       // 拿到上下文
+       var context = canvas.getContext('2d');
+       // 设置线条的颜色
+       context.strokeStyle = 'white';
+       // 设置线条的宽度
+       context.lineWidth = 3;
+	   context.moveTo(10,10);
+	   context.lineTo(0,0);
+	   context.closePath();
+       context.stroke();
+	   var PointsNum = 4,Points = new Array(PointsNum);
+	   var TimeZhen = 50,TimeZhen_ = 1000/TimeZhen;
+	   
+	   function Point(XX,YY,GN,NN){
+			this.x = XX;
+			this.y = YY;
+			this.ConnectGroupNum = GN;
+			this.ConnectGroups = new Array(GN);
+			this.Group = "";
+			this.Draw = function(){
+				for(var i = 0;i < PointsNum;i++){
+					for(var o = 0;o < this.ConnectGroupNum;o++)
+					if(Points[i].Group == this.ConnectGroups[o]){
+						context.beginPath();
+						context.moveTo(this.x,this.y);
+						context.lineTo(Points[i].x,Points[i].y);
+						context.closePath();
+						context.stroke();
+						break;
+					}
+				}
+			}
+			this.NextNum = NN + 1;
+			this.NextNum_ = 1;
+			this.NextsX = new Array(NN+1);
+			this.NextsX[0] = XX;
+			this.NextsY = new Array(NN+1);
+			this.NextsY[0] = YY;
+			this.NextsLastTime = new Array(NN+1);
+			this.NextsLastTime[0] = 0;
+			this.LastTime = 0;
+			this.NextMode = false;
+			this.NowMode = false;
+			this.NextTo = function(){
+				if(this.NextNum_ < this.NextNum){
+					this.x += (this.NextsX[this.NextNum_] - this.NextsX[this.NextNum_-1])/(this.NextsLastTime[this.NextNum_]/TimeZhen_);
+					this.y += (this.NextsY[this.NextNum_] - this.NextsY[this.NextNum_-1])/(this.NextsLastTime[this.NextNum_]/TimeZhen_);
+					this.LastTime += TimeZhen_;
+					if(this.NextNum_ < this.NextNum && this.LastTime >= this.NextsLastTime[this.NextNum_]){
+						this.NextNum_++;
+						this.LastTime = 0;
+					}
+				}
+			}
+	   }
+	   context.lineWidth = 3;
+	   context.moveTo(0,10);
+	   context.lineTo(10,0);
+	   context.closePath();
+       context.stroke();
+	   
+	   Points[0] = new Point(400,400,2,3);
+	   Points[1] = new Point(600,600,1,3);
+	   Points[2] = new Point(400,600,1,3);
+	   Points[3] = new Point(600,400,1,3);
+	   Points[0].Group = "C1";
+	   Points[0].ConnectGroups[0] = "C2";
+	   Points[0].ConnectGroups[1] = "C3";
+	   Points[0].NextsX[1] = 400;
+	   Points[0].NextsY[1] = 500;
+	   Points[0].NextsLastTime[1] = 1000;
+	   Points[0].NextsX[2] = 400;
+	   Points[0].NextsY[2] = 300;
+	   Points[0].NextsLastTime[2] = 250;
+	   Points[0].NextsX[3] = 400;
+	   Points[0].NextsY[3] = 500;
+	   Points[0].NextsLastTime[3] = 500;
+	   Points[1].Group = "C2";
+	   Points[1].ConnectGroups[0] = "C2";
+	   Points[1].NextsX[1] = 600;
+	   Points[1].NextsY[1] = 700;
+	   Points[1].NextsLastTime[1] = 1000;
+	   Points[1].NextsX[2] = 600;
+	   Points[1].NextsY[2] = 600;
+	   Points[1].NextsLastTime[2] = 250;
+	   Points[1].NextsX[3] = 600;
+	   Points[1].NextsY[3] = 700;
+	   Points[1].NextsLastTime[3] = 500;
+	   Points[2].Group = "C2";
+	   Points[2].ConnectGroups[0] = "C2";
+	   Points[2].NextsX[1] = 400;
+	   Points[2].NextsY[1] = 700;
+	   Points[2].NextsLastTime[1] = 1000;
+	   Points[2].NextsX[2] = 400;
+	   Points[2].NextsY[2] = 600;
+	   Points[2].NextsLastTime[2] = 250;
+	   Points[2].NextsX[3] = 400;
+	   Points[2].NextsY[3] = 700;
+	   Points[2].NextsLastTime[3] = 500;
+	   Points[3].Group = "C2";
+	   Points[3].ConnectGroups[0] = "C2";
+	   Points[3].NextsX[1] = 600;
+	   Points[3].NextsY[1] = 500;
+	   Points[3].NextsLastTime[1] = 1000;
+	   Points[3].NextsX[2] = 600;
+	   Points[3].NextsY[2] = 300;
+	   Points[3].NextsLastTime[2] = 250;
+	   Points[3].NextsX[3] = 600;
+	   Points[3].NextsY[3] = 500;
+	   Points[3].NextsLastTime[3] = 500;
+	   var ReDraw = self.setInterval("DrawAll()",TimeZhen_);
+	   function ctna(){
+	   ReDraw = self.setInterval("DrawAll()",TimeZhen_);
+	   }
+	   function stop(){
+	   ReDraw = window.clearInterval(ReDraw);
+	   }
+	   var CLSs = true;
+	   function DrawAll(){
+	   if(CLSs == true)context.clearRect(0,0,canvas.width,canvas.height);
+		for(var a = 0;a < PointsNum;a++){
+			Points[a].NextTo();
+		}
+		for(var a = 0;a < PointsNum;a++){
+			Points[a].Draw();
+		}
+	   }
+       // 绘制直线
+	   //var OOO = self.setInterval("DRAW()",PINLV);
+	   /*function stop(){
+	   OOO = window.clearInterval(OOO);
+	   }
+	   function continueto(){
+	   OOO = self.setInterval("DRAW()",PINLV);
+	   }
+	   
+	   
+	   function DRAW(){
+	   INT = 2, num = 150, radrad = Math.PI/2,times = 0,T = false;
+	   endpointX = 500,endpointY = 500;
+	   if(Irad*2%1 == 0){
+			ApointX = new Array(2*Irad),ApointY = new Array(2*Irad);
+		}
+	   context.clearRect(0,0,canvas.width,canvas.height);
+	   for(var i = 0;i < num;i++){
+	   if(LINEITIT){
+	   context.beginPath();
+      // 起点
+       context.moveTo(endpointX-Pianyi*WidthXY*Math.sin(radrad), endpointY-Pianyi*WidthXY*Math.cos(radrad));
+      // 终点
+       context.lineTo(endpointX+WidthXY*(INT-Pianyi)*Math.sin(radrad), endpointY+WidthXY*(INT-Pianyi)*Math.cos(radrad));
+	   context.closePath();
+       context.stroke();
+	   }
+	   endpointX = endpointX+WidthXY*(INT-Pianyi)*Math.sin(radrad);
+	   endpointY = endpointY+WidthXY*(INT-Pianyi)*Math.cos(radrad);
+	   if(T && LINEIT){
+		context.beginPath();
+		context.moveTo(ApointX[times], ApointY[times]);
+		context.lineTo(endpointX, endpointY);
+		context.closePath();
+		context.stroke();
+	   }else if(times == 2*Irad - 1 && LINEIT){
+		T = true;
+	   }
+	   if(LINEIT){
+		ApointX[times] = endpointX;
+		ApointY[times] = endpointY;}
+	   times++;
+	   if(times%(2*Irad)==0) times = 0;
+	   radrad += Math.PI/Irad;
+       
+	   var OK = true;
+	   while(OK){
+			INT++;
+			OK = false;
+			for(var o = 2;o < INT;o++){
+				if(INT%o == 0){
+					OK = true;
+					break;
+				}
+			}
+	   }
+	   //console.log(INT+" "+endpointX+" "+endpointY);
+	   }
+	   if(poppop) Irad += IradT;
+       }*/
+    
+   // 绘制弧线
+   // context.beginPath();
+   /*
+   * params
+   * 圆心x坐标
+   * 圆心y坐标
+   * 半径
+   * 起始角度
+   * 结束角度
+   * 方向，true 逆时针   false 顺时针  默认false，不写表示false
+   * 
+    context.arc(200,200,100,0,Math.PI/2,false);
+    context.closePath();
+    context.stroke();
+
+    context.strokeStyle = 'red';
+    context.arc(200,200,100,0,Math.PI/2, true);
+    context.closePath();
+    context.stroke();*/
+	/*
+	poppop = false;
+	stop();
+	LINEIT = true;
+	LINEITIT = false;
+	
+	Irad = 2.5;
+	DRAW();
+	*/
+   </script>
+
+</body>
 </html>
